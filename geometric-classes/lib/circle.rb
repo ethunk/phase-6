@@ -9,6 +9,15 @@ class Circle
     @y = y
   end
 
+  def diameter
+    diameter = 2*@radius
+  end
+  def area
+    area = 3.1416*@radius**2
+  end
+  def perimeter
+    perimeter = 3.14*2*@radius
+  end
 end
 
 circle=Circle.new(4)
