@@ -26,13 +26,31 @@ RSpec.describe Leaderboard do
 
   describe ".calculate_records"
     it 'iterates to calculate the win/loss record of each team' do
-      test_board
-      expect(test_board.calculate_records)
+      test_board.teams
+      test_board.calculate_records
+      test_board.teams.count.times do |count|
+        expect(test_board.teams[count].wins).to be_within(2).of(1)
+        expect(test_board.teams[count].losses).to be_within(2).of(1)
+      end
     end
+
+  describe ".calc_ranks" do
+    it 'calculates the rank of the teams in' do
+      test_board.teams
+      test_board.calculate_records
+      test_board.calc_ranks
+      test_board.teams.count.times do |count|
+        expect(test_board.teams[count].rank).to eq(count+1)
+      end
+    end
+  end
 
   describe ".show" do
     it 'outputs the leaderboard' do
-
+      test_board.teams
+      test_board.calculate_records
+      test_board.calc_ranks
+      expect(test_board.show).to be_a_kind_of(String)
     end
   end
 end

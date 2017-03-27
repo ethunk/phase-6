@@ -43,23 +43,73 @@ GAME_INFO = [
   end
 
   def teams
-    @game_info.each do |game|
-      if @teams.include?(game[:home_team]) == false
-        @teams << Team.new(game[:home_team])
+    if @teams.count == 0
+      team_names = []
+      GAME_INFO.each do |game|
+        team_names << game[:home_team]
+        team_names << game[:away_team]
       end
-      if @teams.include?(game[:away_team]) == false
-        @teams << Team.new(game[:away_team])
-      end
-      binding.pry
-      if game[:home_score] > game[:away_score]
-        @teams[index(game[:home_team]]).wins += 1
-        @teams[index(game[:away_team]]).losses += 1
-      else
-        @teams[game[:home_team]].losses += 1
-        @teams[game[:away_team]].wins += 1
+      team_names.uniq!
+      team_names.each do |name|
+         @teams << Team.new(name)
       end
     end
-    binding.pry
     @teams
-    end
   end
+
+  def calculate_records
+      @teams.each do |team|
+        GAME_INFO.each do |game|
+            if game[:home_team] == team.name
+              if game[:home_score] > game[:away_score]
+                team.wins += 1
+              else
+                team.losses += 1
+              end
+            end
+            if game[:away_team] == team.name
+              if game[:away_score] > game[:home_score]
+                team.wins += 1
+              else
+                team.losses += 1
+              end
+            end
+          end
+        end
+    @teams
+  end
+
+  def calc_ranks
+    @teams.sort_by! { |team| team.losses }
+    @teams.each_with_index do |team,i|
+      team.rank = i+1
+    end
+    @teams
+  end
+
+  def show
+    output = ""
+    60.times {output = output + "-"}
+    output = output + "\n| Name       Rank       Total Wins         Total Losses |\n"
+    @teams.each do |team|
+      output = output + "| #{team.name}    #{team.rank}            #{team.wins}                  #{team.losses}          |\n"
+    end
+    60.times {output = output + "-"}
+    output
+  end
+
+end
+board = Leaderboard.new
+board.teams
+board.calculate_records
+board.calc_ranks
+
+binding.pry
+
+# --------------------------------------------------
+# | Name      Rank      Total Wins    Total Losses |
+# | Patriots  1         3             0            |
+# | Steelers  2         1             1            |
+# | Broncos   3         1             2            |
+# | Colts     4         0             2            |
+# --------------------------------------------------
